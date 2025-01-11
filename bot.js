@@ -24,7 +24,7 @@ for (const fileName of commandFileNames) {
 
 // When the bot is ready
 client.once('ready', () => {
-    console.log(`Logged in as ${client.user.tag}!`);
+    console.log("Logged in as " + client.user.tag);
 });
 
 // Respond to slash commands
