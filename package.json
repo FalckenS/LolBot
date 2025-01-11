@@ -2,7 +2,9 @@
   "name": "lolbot",
   "version": "1.0.0",
   "main": "bot.js",
-  "scripts": {},
+  "scripts": {
+    "start": "node bot.js"
+  },
   "private": true,
   "keywords": [],
   "author": "Samuel Falck",
