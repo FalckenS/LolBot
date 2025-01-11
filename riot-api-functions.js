@@ -78,67 +78,67 @@ function constructStatsTextArray(gameName, playerMatchData, matchData) {
 
     const gameNameLastChar = gameName.slice(-1);
     if (gameNameLastChar === "s" || gameNameLastChar === "S") {
-        statsTextArray.push("__Stats for " + gameName + " latest game:__");
+        statsTextArray.push("**Stats for " + gameName + " latest game:**");
     }
     else {
-        statsTextArray.push("__Stats for " + gameName + "'s latest game:__");
+        statsTextArray.push("**Stats for " + gameName + "'s latest game:**");
     }
 
     statsTextArray.push("");
 
     // noinspection SpellCheckingInspection
     if ((playerMatchData.championName === "Urgot") && (gameName === "YoloBoiis")) {
-        statsTextArray.push("__Champ:__ Urgot (sällan)");
+        statsTextArray.push("**Champ:** Urgot (sällan)");
     }
     else {
-        statsTextArray.push("__Champ:__ " + playerMatchData.championName);
+        statsTextArray.push("**Champ:** " + playerMatchData.championName);
     }
     const gameDurationSeconds = matchData.info.gameDuration;
-    statsTextArray.push("__Duration:__ " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
+    statsTextArray.push("**Duration:** " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
     if (playerMatchData.win) {
-        statsTextArray.push("__Victory!__");
+        statsTextArray.push("**Victory!**");
     }
     else {
-        statsTextArray.push("__Defeat! (jg diff)__");
+        statsTextArray.push("**Defeat!** (jg diff)");
     }
 
     statsTextArray.push("");
 
-    statsTextArray.push("__Kills:__ " + playerMatchData.kills);
-    statsTextArray.push("__Deaths:__ " + playerMatchData.deaths);
-    statsTextArray.push("__Assists:__ " + playerMatchData.assists);
-    let kdaString = "__KDA:__ " + playerMatchData.kda.toFixed(2);
+    statsTextArray.push("**Kills:** " + playerMatchData.kills);
+    statsTextArray.push("**Deaths:** " + playerMatchData.deaths);
+    statsTextArray.push("**Assists:** " + playerMatchData.assists);
+    let kdaString = "**KDA:** " + playerMatchData.kda.toFixed(2);
     if (playerMatchData.kda < kdaToNotBeAInter) {
-        kdaString += "__ bro__";
+        kdaString += "** nah bro**";
     }
     statsTextArray.push(kdaString);
-    statsTextArray.push("__Kill participation:__ " +
+    statsTextArray.push("**Kill participation:** " +
         (playerMatchData.killParticipation * 100).toFixed(0) + "%");
 
     statsTextArray.push("");
 
     const cs = playerMatchData.totalMinionsKilled + playerMatchData.neutralMinionsKilled;
-    statsTextArray.push("__CS:__ " + cs + " (" + Math.floor((cs / (gameDurationSeconds / 60)) * 10) / 10 + ")");
-    statsTextArray.push("__Vision score:__ " + playerMatchData.damageDealtToTurrets);
+    statsTextArray.push("**CS:** " + cs + " (" + Math.floor((cs / (gameDurationSeconds / 60)) * 10) / 10 + ")");
+    statsTextArray.push("**Vision score:** " + playerMatchData.damageDealtToTurrets);
 
     statsTextArray.push("");
 
-    statsTextArray.push("__Damage to players:__ " + playerMatchData.totalDamageDealtToChampions);
-    statsTextArray.push("__Damage to turrets:__ " + playerMatchData.damageDealtToTurrets);
-    statsTextArray.push("__Damage taken:__ " + playerMatchData.totalDamageTaken);
+    statsTextArray.push("**Damage to players:** " + playerMatchData.totalDamageDealtToChampions);
+    statsTextArray.push("**Damage to turrets:** " + playerMatchData.damageDealtToTurrets);
+    statsTextArray.push("**Damage taken:** " + playerMatchData.totalDamageTaken);
 
     statsTextArray.push("");
 
     if (playerMatchData.soloKills > 0) {
-        statsTextArray.push("__SOLOBOLO?__  Yes");
+        statsTextArray.push("**SOLOBOLO?**  Yes");
     }
     else {
-        statsTextArray.push("__SOLOBOLO?__  No");
+        statsTextArray.push("**SOLOBOLO?**  No");
     }
-    statsTextArray.push("__Objective steals:__ " + playerMatchData.epicMonsterSteals);
-    statsTextArray.push("__Skillshots hit:__ " + playerMatchData.skillshotsHit);
-    statsTextArray.push("__Dodged skillshots:__ " + playerMatchData.skillshotsDodged);
-    statsTextArray.push("__\"Enemy missing\"-pings:__ " + playerMatchData.enemyMissingPings);
+    statsTextArray.push("**Objective steals:** " + playerMatchData.epicMonsterSteals);
+    statsTextArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
+    statsTextArray.push("**Dodged skillshots:** " + playerMatchData.skillshotsDodged);
+    statsTextArray.push("**\"Enemy missing\"-pings:** " + playerMatchData.enemyMissingPings);
 
     return statsTextArray;
 }
