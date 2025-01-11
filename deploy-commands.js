@@ -41,7 +41,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_LOLBOT_TOK
         // Deploy commands globally:
         await rest.put(
             // API route
-            Routes.applicationCommands(process.env.CLIENT_ID),
+            Routes.applicationCommands(process.env.DISCORD_APPLICATION_CLIENT_ID),
             // Send the commands array in the request body
             { body: commands }
         );
