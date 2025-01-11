@@ -1,13 +1,11 @@
 {
   "name": "lolbot",
   "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "bot.js",
+  "scripts": {},
   "private": true,
   "keywords": [],
-  "author": "",
+  "author": "Samuel Falck",
   "license": "ISC",
   "description": "",
   "dependencies": {
