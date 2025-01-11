@@ -79,7 +79,8 @@ function constructStatsTextArray(gameName, playerMatchData, matchData) {
     const gameNameLastChar = gameName.slice(-1);
     if (gameNameLastChar === "s" || gameNameLastChar === "S") {
         statsTextArray.push("__Stats for " + gameName + " latest game:__");
-    } else {
+    }
+    else {
         statsTextArray.push("__Stats for " + gameName + "'s latest game:__");
     }
 
@@ -96,7 +97,8 @@ function constructStatsTextArray(gameName, playerMatchData, matchData) {
     statsTextArray.push("__Duration:__ " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
     if (playerMatchData.win) {
         statsTextArray.push("__Victory!__");
-    } else {
+    }
+    else {
         statsTextArray.push("__Defeat! (jg diff)__");
     }
 
@@ -107,7 +109,7 @@ function constructStatsTextArray(gameName, playerMatchData, matchData) {
     statsTextArray.push("__Assists:__ " + playerMatchData.assists);
     let kdaString = "__KDA:__ " + playerMatchData.kda.toFixed(2);
     if (playerMatchData.kda < kdaToNotBeAInter) {
-        kdaString += "__ bro :skull:__";
+        kdaString += "__ bro__";
     }
     statsTextArray.push(kdaString);
     statsTextArray.push("__Kill participation:__ " +
@@ -128,9 +130,10 @@ function constructStatsTextArray(gameName, playerMatchData, matchData) {
     statsTextArray.push("");
 
     if (playerMatchData.soloKills > 0) {
-        statsTextArray.push("__SOLOBOLO?__ :LeoGerTummeUpp:");
-    } else {
-        statsTextArray.push("__SOLOBOLO?__ :LeoGerTummeNer:");
+        statsTextArray.push("__SOLOBOLO?__  Yes");
+    }
+    else {
+        statsTextArray.push("__SOLOBOLO?__  No");
     }
     statsTextArray.push("__Objective steals:__ " + playerMatchData.epicMonsterSteals);
     statsTextArray.push("__Skillshots hit:__ " + playerMatchData.skillshotsHit);
