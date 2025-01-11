@@ -27,16 +27,25 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_LOLBOT_TOK
     try {
         console.log("Started refreshing application commands...");
 
+        // Fetch and delete all existing commands (cleanup)
+        const existingCommands = await rest.get(Routes.applicationCommands(process.env.DISCORD_APPLICATION_CLIENT_ID));
+        for (const cmd of existingCommands) {
+            // noinspection JSCheckFunctionSignatures,JSUnresolvedReference
+            await rest.delete(
+                Routes.applicationCommands(process.env.DISCORD_APPLICATION_CLIENT_ID) + "/" + cmd.id
+            );
+            // noinspection JSUnresolvedReference
+            console.log("Deleted command: " + cmd.name);
+        }
+
         // Deploys commands to a specific guild/server (faster update time):
         // noinspection JSUnresolvedReference
-        /*
-        await rest.put(
+        /*await rest.put(
             // API route
-            Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_CLIENT_ID, process.env.GUILD_ID),
+            Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_CLIENT_ID, process.env.SERVER_ID),
             // Send the commands array in the request body
             { body: commands }
-        );
-        */
+        );*/
 
         // Deploy commands globally:
         await rest.put(
