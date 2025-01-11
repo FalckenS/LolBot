@@ -19,7 +19,7 @@ for (const file of commandFileNames) {
 // The REST client allows the bot to interact with the Discord REST API. The REST API is used to perform actions like
 // registering slash commands, sending messages, or managing servers. The REST Client makes it easy to send HTTP
 // requests to the Discord API without needing to manually construct requests, headers or handle authentication
-const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN);
+const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_LOLBOT_TOKEN);
 
 // Deploy the commands
 (async () => {
@@ -32,7 +32,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_BOT_TOKEN)
         /*
         await rest.put(
             // API route
-            Routes.applicationGuildCommands(process.env.APPLICATION_CLIENT_ID, process.env.GUILD_ID),
+            Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_CLIENT_ID, process.env.GUILD_ID),
             // Send the commands array in the request body
             { body: commands }
         );

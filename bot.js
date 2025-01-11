@@ -50,4 +50,4 @@ client.on('interactionCreate', async interaction => {
 
 // Login with the bot token
 // noinspection JSIgnoredPromiseFromCall
-client.login(process.env.DISCORD_BOT_TOKEN);
+client.login(process.env.DISCORD_LOLBOT_TOKEN);
