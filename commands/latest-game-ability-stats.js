@@ -1,12 +1,12 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { getLatestMatchStats } = require('../riot-api-functions');
+const { getLatestMatchAbilitiesStats } = require('../riot-api-functions');
 
 // The command
 // This is what is returned when require() is used on this file
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('latest-game-stats')
-        .setDescription('Shows some stats from the latest game')
+        .setName('latest-game-ability-stats')
+        .setDescription('Shows stats about used abilities from the latest game')
         .addStringOption(option =>
             option
                 .setName('riot-id')
@@ -33,7 +33,7 @@ module.exports = {
         }
         try {
             // Get the game stats array and reply with every stat on a new line
-            const statsTextArray = await getLatestMatchStats(gameName, tagLine);
+            const statsTextArray = await getLatestMatchAbilitiesStats(gameName, tagLine);
             const reply = statsTextArray.join('\n');
             await interaction.reply(reply);
         }

@@ -1,9 +1,8 @@
 // noinspection JSUnresolvedReference
 
-// The lowest KDA to not be considered an inter
-const kdaToNotBeAInter = 1;
-
-module.exports = { getLatestGameStats };
+module.exports = {
+    getLatestMatchStats: getLatestMatchStats, getLatestMatchAbilitiesStats: getLatestMatchAbilitiesStats
+};
 require('dotenv').config();
 const axios = require("axios");
 
@@ -24,7 +23,6 @@ const GET_A_MATCH_BY_MATCH_ID_URL = "/lol/match/v5/matches/";
 
 // Calls Riot API with an endpoint URL and returns the response data
 async function getRiotAPIResponseData(endpointURL) {
-    // noinspection JSCheckFunctionSignatures
     const response = await axios.get(
         BASE_URL+endpointURL, {
             headers: {
@@ -36,8 +34,8 @@ async function getRiotAPIResponseData(endpointURL) {
 
 // Returns the puuid (string)
 async function getPuuid(gameName, tagLine) {
-    return (await getRiotAPIResponseData(
-        GET_ACCOUNT_BY_RIOT_ID_URL+gameName+"/"+tagLine)
+    return (
+        await getRiotAPIResponseData(GET_ACCOUNT_BY_RIOT_ID_URL+gameName+"/"+tagLine)
     ).puuid;
 }
 
@@ -47,9 +45,7 @@ async function getMatchIDs(puuid, numOfMatches, onlyRanked) {
     if(onlyRanked) {
         queryParameters += "&type=ranked";
     }
-    return await getRiotAPIResponseData(
-        GET_A_LIST_OF_MATCH_IDS_BY_PUUID_URL+puuid+"/ids?"+queryParameters
-    );
+    return await getRiotAPIResponseData(GET_A_LIST_OF_MATCH_IDS_BY_PUUID_URL+puuid+"/ids?"+queryParameters);
 }
 
 // Returns information about a LoL match (JSON object)
@@ -58,6 +54,9 @@ async function getMatchData(matchID) {
 }
 
 // --------------------------------------------------------------------------------------------------------------------
+
+// The lowest KDA to not be considered an inter
+const kdaToNotBeAInter = 1;
 
 // Returns a combined object consisting of ParticipantDto and ChallengesDto for a player
 // https://developer.riotgames.com/apis#match-v5/GET_getMatch
@@ -71,102 +70,127 @@ function getPlayerMatchData(matchData, gameName) {
     }
 }
 
-// Returns an array with stats about a game (string[]). Some elements are empty strings that separates the array into
-// "categories" (looks better when printed)
-function constructStatsTextArray(gameName, playerMatchData, matchData) {
-    const statsTextArray = [];
-
-    const gameNameLastChar = gameName.slice(-1);
-    if (gameNameLastChar === "s" || gameNameLastChar === "S") {
-        statsTextArray.push("**Stats for " + gameName + " latest game:**");
-    }
-    else {
-        statsTextArray.push("**Stats for " + gameName + "'s latest game:**");
-    }
-
-    statsTextArray.push("");
-
-    // noinspection SpellCheckingInspection
-    if ((playerMatchData.championName === "Urgot") && (gameName === "YoloBoiis")) {
-        statsTextArray.push("**Champ:** Urgot (sällan)");
-    }
-    else {
-        statsTextArray.push("**Champ:** " + playerMatchData.championName);
-    }
-    const gameDurationSeconds = matchData.info.gameDuration;
-    statsTextArray.push("**Duration:** " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
-    if (playerMatchData.win) {
-        statsTextArray.push("**Victory!**");
-    }
-    else {
-        statsTextArray.push("**Defeat!** (jg diff)");
-    }
-
-    statsTextArray.push("");
-
-    statsTextArray.push("**Kills:** " + playerMatchData.kills);
-    statsTextArray.push("**Deaths:** " + playerMatchData.deaths);
-    statsTextArray.push("**Assists:** " + playerMatchData.assists);
-    let kdaString = "**KDA:** " + playerMatchData.kda.toFixed(2);
-    if (playerMatchData.kda < kdaToNotBeAInter) {
-        kdaString += "** nah bro**";
-    }
-    statsTextArray.push(kdaString);
-    statsTextArray.push("**Kill participation:** " +
-        (playerMatchData.killParticipation * 100).toFixed(0) + "%");
-
-    statsTextArray.push("");
-
-    const cs = playerMatchData.totalMinionsKilled + playerMatchData.neutralMinionsKilled;
-    statsTextArray.push("**CS:** " + cs + " (" + Math.floor((cs / (gameDurationSeconds / 60)) * 10) / 10 + ")");
-    statsTextArray.push("**Vision score:** " + playerMatchData.damageDealtToTurrets);
-
-    statsTextArray.push("");
-
-    statsTextArray.push("**Damage to players:** " + playerMatchData.totalDamageDealtToChampions);
-    statsTextArray.push("**Damage to turrets:** " + playerMatchData.damageDealtToTurrets);
-    statsTextArray.push("**Damage taken:** " + playerMatchData.totalDamageTaken);
-
-    statsTextArray.push("");
-
-    if (playerMatchData.soloKills > 0) {
-        statsTextArray.push("**SOLOBOLO?**  Yes");
-    }
-    else {
-        statsTextArray.push("**SOLOBOLO?**  No");
-    }
-    statsTextArray.push("**Objective steals:** " + playerMatchData.epicMonsterSteals);
-    statsTextArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
-    statsTextArray.push("**Dodged skillshots:** " + playerMatchData.skillshotsDodged);
-    statsTextArray.push("**\"Enemy missing\"-pings:** " + playerMatchData.enemyMissingPings);
-
-    return statsTextArray;
-}
-
-// Returns stats for a players latest game (string[])
-async function getLatestGameStats(gameName, tagLine) {
+async function getLatestMatchPlayerData(gameName, tagLine) {
     // Get the puuid
     let puuid;
     try {
         puuid = await getPuuid(gameName, tagLine);
-    }
-    catch (error) {
-        // noinspection GrazieInspection
+    } catch (error) {
         throw new Error(
             "No Riot account with the name \"" + gameName + "\" and the tag \"" + tagLine + "\" found on EUW!");
     }
-
     // Get the match data
     let matchData;
     try {
         const recentMatchIDs = await getMatchIDs(puuid, 1);
         matchData = await getMatchData(recentMatchIDs[0]);
-    }
-    catch (error) {
+    } catch (error) {
         throw new Error("No recent matches found!");
     }
-
     // Get match data for the player
     const playerMatchData = await getPlayerMatchData(matchData, gameName);
-    return constructStatsTextArray(gameName, playerMatchData, matchData);
+    return {matchData, playerMatchData};
+}
+
+function getOutputArrayStart(gameName, playerMatchData) {
+    // This shit is ugly
+    const outputArray = [];
+
+    const gameNameLastChar = gameName.slice(-1);
+    if (gameNameLastChar === "s" || gameNameLastChar === "S") {
+        outputArray.push("**Stats for " + gameName + " latest game:**");
+    } else {
+        outputArray.push("**Stats for " + gameName + "'s latest game:**");
+    }
+
+    outputArray.push("");
+
+    if ((playerMatchData.championName === "Urgot") && (gameName === "YoloBoiis")) {
+        outputArray.push("**Champ:** Urgot (sällan)");
+    } else {
+        outputArray.push("**Champ:** " + playerMatchData.championName);
+    }
+    return outputArray;
+}
+
+// Returns stats for a players latest match (string[])
+async function getLatestMatchStats(gameName, tagLine) {
+    let {matchData, playerMatchData} = await getLatestMatchPlayerData(gameName, tagLine);
+
+    // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
+    // into "categories" (looks better when printed)
+    function constructOutputArray(gameName, playerMatchData, matchData) {
+        const outputArray = getOutputArrayStart(gameName, playerMatchData);
+
+        const gameDurationSeconds = matchData.info.gameDuration;
+        outputArray.push(
+            "**Duration:** " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
+        if (playerMatchData.win) {
+            outputArray.push("**Victory!**");
+        }
+        else {
+            outputArray.push("**Defeat!** (jg diff)");
+        }
+
+        outputArray.push("");
+
+        outputArray.push("**Kills:** " + playerMatchData.kills);
+        outputArray.push("**Deaths:** " + playerMatchData.deaths);
+        outputArray.push("**Assists:** " + playerMatchData.assists);
+        let kdaString = "**KDA:** " + playerMatchData.kda.toFixed(2);
+        if (playerMatchData.kda < kdaToNotBeAInter) {
+            kdaString += "** nah bro**";
+        }
+        outputArray.push(kdaString);
+        outputArray.push("**Kill participation:** " +
+            (playerMatchData.killParticipation * 100).toFixed(0) + "%");
+
+        outputArray.push("");
+
+        const cs = playerMatchData.totalMinionsKilled + playerMatchData.neutralMinionsKilled;
+        outputArray.push("**CS:** " + cs + " (" + Math.floor((cs / (gameDurationSeconds / 60)) * 10) / 10 + ")");
+        outputArray.push("**Vision score:** " + playerMatchData.damageDealtToTurrets);
+
+        outputArray.push("");
+
+        outputArray.push("**Damage to players:** " + playerMatchData.totalDamageDealtToChampions);
+        outputArray.push("**Damage to turrets:** " + playerMatchData.damageDealtToTurrets);
+        outputArray.push("**Damage taken:** " + playerMatchData.totalDamageTaken);
+
+        outputArray.push("");
+
+        if (playerMatchData.soloKills > 0) {
+            outputArray.push("**SOLOBOLO?**  Yes");
+        }
+        else {
+            outputArray.push("**SOLOBOLO?**  No");
+        }
+        outputArray.push("**Objective steals:** " + playerMatchData.epicMonsterSteals);
+        outputArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
+        outputArray.push("**Dodged skillshots:** " + playerMatchData.skillshotsDodged);
+        outputArray.push("**\"Enemy missing\"-pings:** " + playerMatchData.enemyMissingPings);
+
+        return outputArray;
+    }
+    return constructOutputArray(gameName, playerMatchData, matchData);
+}
+
+// Returns stats about abilities used for players latest match (string[])
+async function getLatestMatchAbilitiesStats(gameName, tagLine) {
+    let {matchData, playerMatchData} = await getLatestMatchPlayerData(gameName, tagLine);
+
+    // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
+    // into "categories" (looks better when printed)
+    function constructOutputArray(gameName, playerMatchData) {
+        const outputArray = getOutputArrayStart(gameName, playerMatchData);
+
+        outputArray.push("**Qs used:** " + playerMatchData.spell1Casts);
+        outputArray.push("**Ws used:** " + playerMatchData.spell2Casts);
+        outputArray.push("**Es used:** " + playerMatchData.spell3Casts);
+        outputArray.push("**Ults used:** " + playerMatchData.spell4Casts);
+        outputArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
+
+        return outputArray;
+    }
+    return constructOutputArray(gameName, playerMatchData, matchData);
 }

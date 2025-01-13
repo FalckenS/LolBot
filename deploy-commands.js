@@ -1,7 +1,6 @@
-// Load environment variables
-require('dotenv').config();
+// noinspection JSUnresolvedReference
 
-// Import modules
+require('dotenv').config();
 const { REST, Routes } = require('discord.js');
 const fs = require('fs');
 const path = require('path');
@@ -30,16 +29,13 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_LOLBOT_TOK
         // Fetch and delete all existing commands (cleanup)
         const existingCommands = await rest.get(Routes.applicationCommands(process.env.DISCORD_APPLICATION_CLIENT_ID));
         for (const cmd of existingCommands) {
-            // noinspection JSCheckFunctionSignatures,JSUnresolvedReference
             await rest.delete(
                 Routes.applicationCommands(process.env.DISCORD_APPLICATION_CLIENT_ID) + "/" + cmd.id
             );
-            // noinspection JSUnresolvedReference
             console.log("Deleted command: " + cmd.name);
         }
 
         // Deploys commands to a specific guild/server (faster update time):
-        // noinspection JSUnresolvedReference
         /*await rest.put(
             // API route
             Routes.applicationGuildCommands(process.env.DISCORD_APPLICATION_CLIENT_ID, process.env.SERVER_ID),
@@ -56,7 +52,8 @@ const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_LOLBOT_TOK
         );
 
         console.log("Successfully reloaded application commands!");
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error);
     }
 })();

@@ -1,7 +1,6 @@
-// Load environment variables
-require('dotenv').config();
+// noinspection JSUnresolvedReference
 
-// Import modules
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
@@ -9,7 +8,6 @@ const { Client, Collection, GatewayIntentBits } = require('discord.js');
 // Create a Discord client instance
 // The intents are the types of events the bot will receive from the Discord Gateway. "Guilds" include guild-related
 // events like slash commands (guild = server)
-// noinspection JSUnresolvedReference
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 // Load the commands into client.commands
@@ -49,5 +47,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 // Login with the bot token
-// noinspection JSIgnoredPromiseFromCall
 client.login(process.env.DISCORD_LOLBOT_TOKEN);
