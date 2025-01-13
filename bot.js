@@ -39,7 +39,8 @@ client.on('interactionCreate', async interaction => {
     // Execute the command
     try {
         await command.execute(interaction);
-    } catch (error) {
+    }
+    catch (error) {
         console.error(error);
         // Ephemeral means only the user who triggered the interaction will see the message
         await interaction.reply({ content: 'There was an error executing that command!', ephemeral: true });

@@ -1,7 +1,9 @@
 // noinspection JSUnresolvedReference
 
 module.exports = {
-    getLatestMatchStats: getLatestMatchStats, getLatestMatchAbilitiesStats: getLatestMatchAbilitiesStats
+    getLatestMatchStats: getLatestMatchStats,
+    getLatestMatchAbilitiesStats: getLatestMatchAbilitiesStats,
+    getLatestMatchLaneStats: getLatestMatchLaneStats
 };
 require('dotenv').config();
 const axios = require("axios");
@@ -75,7 +77,8 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
     let puuid;
     try {
         puuid = await getPuuid(gameName, tagLine);
-    } catch (error) {
+    }
+    catch (error) {
         throw new Error(
             "No Riot account with the name \"" + gameName + "\" and the tag \"" + tagLine + "\" found on EUW!");
     }
@@ -84,7 +87,8 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
     try {
         const recentMatchIDs = await getMatchIDs(puuid, 1);
         matchData = await getMatchData(recentMatchIDs[0]);
-    } catch (error) {
+    }
+    catch (error) {
         throw new Error("No recent matches found!");
     }
     // Get match data for the player
@@ -96,21 +100,74 @@ function getOutputArrayStart(gameName, playerMatchData) {
     // This shit is ugly
     const outputArray = [];
 
+    // Name
     const gameNameLastChar = gameName.slice(-1);
     if (gameNameLastChar === "s" || gameNameLastChar === "S") {
         outputArray.push("**Stats for " + gameName + " latest game:**");
-    } else {
+    }
+    else {
         outputArray.push("**Stats for " + gameName + "'s latest game:**");
     }
 
     outputArray.push("");
 
+    // Duration
+    const gameDurationSeconds = matchData.info.gameDuration;
+    outputArray.push("**Duration:** " + Math.floor(gameDurationSeconds/60) + "m " + gameDurationSeconds % 60 + "s");
+    // Win/Loss
+    if (playerMatchData.win) {
+        outputArray.push("**Victory!**");
+    }
+    else {
+        outputArray.push("**Defeat!** (jg diff)");
+    }
+    // Champ
     if ((playerMatchData.championName === "Urgot") && (gameName === "YoloBoiis")) {
         outputArray.push("**Champ:** Urgot (sällan)");
-    } else {
+    }
+    else {
         outputArray.push("**Champ:** " + playerMatchData.championName);
     }
+    outputArray.push("");
     return outputArray;
+}
+
+// Returns stats about the laning phase for a players latest match (string[])
+async function getLatestMatchLaneStats(gameName, tagLine) {
+    let {matchData, playerMatchData} = await getLatestMatchPlayerData(gameName, tagLine);
+
+    // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
+    // into "categories" (looks better when printed)
+    function constructOutputArray(gameName, playerMatchData) {
+        const outputArray = getOutputArrayStart(gameName, playerMatchData);
+
+        outputArray.push("**Lane minions first 10 minutes:** " + playerMatchData.laneMinionsFirst10Minutes);
+        outputArray.push("**Max CS advantage on lane opponent:** " + playerMatchData.maxCsAdvantageOnLaneOpponent);
+        outputArray.push("**Max level lead on lane opponent:** " + playerMatchData.maxLevelLeadLaneOpponent);
+
+        return outputArray;
+    }
+    return constructOutputArray(gameName, playerMatchData, matchData);
+}
+
+// Returns stats about used abilities for players latest match (string[])
+async function getLatestMatchAbilitiesStats(gameName, tagLine) {
+    let {matchData, playerMatchData} = await getLatestMatchPlayerData(gameName, tagLine);
+
+    // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
+    // into "categories" (looks better when printed)
+    function constructOutputArray(gameName, playerMatchData) {
+        const outputArray = getOutputArrayStart(gameName, playerMatchData);
+
+        outputArray.push("**Qs used:** " + playerMatchData.spell1Casts);
+        outputArray.push("**Ws used:** " + playerMatchData.spell2Casts);
+        outputArray.push("**Es used:** " + playerMatchData.spell3Casts);
+        outputArray.push("**Ults used:** " + playerMatchData.spell4Casts);
+        outputArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
+
+        return outputArray;
+    }
+    return constructOutputArray(gameName, playerMatchData, matchData);
 }
 
 // Returns stats for a players latest match (string[])
@@ -119,18 +176,8 @@ async function getLatestMatchStats(gameName, tagLine) {
 
     // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
     // into "categories" (looks better when printed)
-    function constructOutputArray(gameName, playerMatchData, matchData) {
+    function constructOutputArray(gameName, playerMatchData) {
         const outputArray = getOutputArrayStart(gameName, playerMatchData);
-
-        const gameDurationSeconds = matchData.info.gameDuration;
-        outputArray.push(
-            "**Duration:** " + Math.floor(gameDurationSeconds / 60) + "m " + gameDurationSeconds % 60 + "s");
-        if (playerMatchData.win) {
-            outputArray.push("**Victory!**");
-        }
-        else {
-            outputArray.push("**Defeat!** (jg diff)");
-        }
 
         outputArray.push("");
 
@@ -169,26 +216,6 @@ async function getLatestMatchStats(gameName, tagLine) {
         outputArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
         outputArray.push("**Dodged skillshots:** " + playerMatchData.skillshotsDodged);
         outputArray.push("**\"Enemy missing\"-pings:** " + playerMatchData.enemyMissingPings);
-
-        return outputArray;
-    }
-    return constructOutputArray(gameName, playerMatchData, matchData);
-}
-
-// Returns stats about abilities used for players latest match (string[])
-async function getLatestMatchAbilitiesStats(gameName, tagLine) {
-    let {matchData, playerMatchData} = await getLatestMatchPlayerData(gameName, tagLine);
-
-    // Returns an array with stats about a match (string[]). Some elements are empty strings that separates the array
-    // into "categories" (looks better when printed)
-    function constructOutputArray(gameName, playerMatchData) {
-        const outputArray = getOutputArrayStart(gameName, playerMatchData);
-
-        outputArray.push("**Qs used:** " + playerMatchData.spell1Casts);
-        outputArray.push("**Ws used:** " + playerMatchData.spell2Casts);
-        outputArray.push("**Es used:** " + playerMatchData.spell3Casts);
-        outputArray.push("**Ults used:** " + playerMatchData.spell4Casts);
-        outputArray.push("**Skillshots hit:** " + playerMatchData.skillshotsHit);
 
         return outputArray;
     }
