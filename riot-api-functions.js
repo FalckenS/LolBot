@@ -75,10 +75,14 @@ function getPlayerMatchData(matchData, gameName) {
 async function getLatestMatchPlayerData(gameName, tagLine) {
     // Get the puuid
     let puuid;
+    console.log("gameName: " + gameName);
+    console.log("gameName: " + tagLine);
     try {
         puuid = await getPuuid(gameName, tagLine);
+        console.log("puuid: " + puuid);
     }
     catch (error) {
+        console.log("Could not get puuid!");
         throw new Error(
             "No Riot account with the name \"" + gameName + "\" and the tag \"" + tagLine + "\" found on EUW!");
     }
@@ -89,6 +93,7 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
         matchData = await getMatchData(recentMatchIDs[0]);
     }
     catch (error) {
+        console.log("Could not get recent matches!");
         throw new Error("No recent matches found!");
     }
     // Get match data for the player
