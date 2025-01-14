@@ -75,14 +75,14 @@ function getPlayerMatchData(matchData, gameName) {
 async function getLatestMatchPlayerData(gameName, tagLine) {
     // Get the puuid
     let puuid;
-    console.log("gameName: " + gameName);
-    console.log("gameName: " + tagLine);
+    console.log("Name: " + gameName);
+    console.log("Tag: " + tagLine);
     try {
         puuid = await getPuuid(gameName, tagLine);
-        console.log("puuid: " + puuid);
+        console.log("Got puuid: " + puuid);
     }
     catch (error) {
-        console.log("Could not get puuid!");
+        console.log("Could not retrieve puuid!");
         throw new Error(
             "No Riot account with the name \"" + gameName + "\" and the tag \"" + tagLine + "\" found on EUW!");
     }
@@ -90,14 +90,24 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
     let matchData;
     try {
         const recentMatchIDs = await getMatchIDs(puuid, 1);
+        console.log("Got recentMatchIDs: " + recentMatchIDs[0]);
         matchData = await getMatchData(recentMatchIDs[0]);
+        console.log("Got matchData: " + matchData);
     }
     catch (error) {
-        console.log("Could not get recent matches!");
+        console.log("Could not retrieve recent matches!");
         throw new Error("No recent matches found!");
     }
     // Get match data for the player
-    const playerMatchData = await getPlayerMatchData(matchData, gameName);
+    let playerMatchData;
+    try {
+        playerMatchData = await getPlayerMatchData(matchData, gameName);
+        console.log("Got player match data: " + playerMatchData);
+    }
+    catch (error) {
+        console.log("Could not retrieve player match data!");
+        throw new Error("Could not retrieve player match data!");
+    }
     return {matchData, playerMatchData};
 }
 
