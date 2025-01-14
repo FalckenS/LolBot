@@ -92,7 +92,7 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
         const recentMatchIDs = await getMatchIDs(puuid, 1);
         console.log("Got recentMatchIDs: " + recentMatchIDs[0]);
         matchData = await getMatchData(recentMatchIDs[0]);
-        console.log("Got matchData: " + matchData);
+        console.log("Got matchData: " + matchData.metadata.participants);
     }
     catch (error) {
         console.log("Could not retrieve recent matches!");
@@ -102,7 +102,7 @@ async function getLatestMatchPlayerData(gameName, tagLine) {
     let playerMatchData;
     try {
         playerMatchData = await getPlayerMatchData(matchData, gameName);
-        console.log("Got player match data: " + playerMatchData);
+        console.log("Got player match data: " + playerMatchData.championName);
     }
     catch (error) {
         console.log("Could not retrieve player match data!");
